@@ -11,22 +11,14 @@ const app = express();
 app.use(cors());
 
 // Bodyparser middleware
-app.use(
-  bodyParser.urlencoded({
-    extended: false,
-  }),
-);
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-const db =
-  'mongodb+srv://user:pass@wanttodos.wmvco30.mongodb.net/?retryWrites=true&w=majority';
-mongoose
-  .connect(db, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('Mongodb connection Successful'))
-  .catch(e => console.log(e));
+const db = require('./db');
+
+db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
 app.use(passport.initialize());
-
 require('./config/passport')(passport);
 
 // Routes
