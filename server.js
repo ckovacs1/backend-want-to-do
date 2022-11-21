@@ -9,7 +9,8 @@ const Users = require('./routes/user');
 const app = express();
 const User = require('./models/User');
 
-const toDos = require('./models/WantToDos')
+const toDos = require('./models/WantToDos');
+const Notifs = require("./models/FollowNotifications"); 
 
 app.use(cors());
 
@@ -96,6 +97,7 @@ app.get('/api/viewtoDos', async function(req, res){
     return res.status(200).json({ success: true, data: alltoDos })
 }).catch(err => console.log(err))
 });
+
 app.delete('/api/deletetoDos', async function(req, res){
   await toDos.findOneAndDelete({ _id: req.params.id }, (err, toDo) => {
     if (err) {
@@ -145,6 +147,53 @@ app.get('/api/viewUsers', async function(req, res){
     return res.status(200).json({ success: true, data: allUsers })
 }).catch(err => console.log(err))
 });
+
+app.get('/api/viewNotifs', async function(req,res) {
+  // User.findOne(logged in userID)
+  // populate notifications array 
+  // display notifications to user
+});
+
+
+app.post('/api/updateNotifs', async function(req,res) {
+  // interaction: mark as read or mark all as read
+
+  // User.findOne(logged in userID)
+  // populate notifications array 
+  // change {read: false} to {read: true}
+  // res.send updated notif(s)
+});
+
+app.get('/api/viewFollowers', async function(req,res) {
+  // User.findOne(logged in userID)
+  // populate followers array 
+  // return user followers
+});
+
+app.get('/api/viewFollowing', async function(req,res) {
+  // User.findOne(logged in userID)
+  // populate following array 
+  // return following
+});
+
+app.post('/api/unfollow', async function(req,res) {
+  // User.findOne(logged in userID)
+  // access following array 
+  // in following array, search for userID to be unfollowed 
+  // splice 
+  // return updated following array
+});
+
+app.post('/api/follow', async function(req,res) {
+  // User.findOne(logged in userID)
+  // access following array 
+  // in following array, search for userID to be followed 
+  // push (or unshift) 
+  // return updated following array
+});
+
+
+no
 
 const port = 5000;
 app.listen(5000, () => console.log('Server on port 5000'));
