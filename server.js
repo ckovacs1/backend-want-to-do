@@ -1,9 +1,17 @@
 const express = require('express');
+const bodyParser = require('body-parser')
 const cors = require('cors');
 
 const app = express();
 
+app.use(bodyParser.urlencoded({extended: true}))
+
 app.use(cors());
+
+app.use(bodyParser.json())
+const db = require('./db')
+
+db.on('error', console.error.bind(console, 'MongoDB connection error:'))
 
 app.get('/profile', (req, res) => {
   res.json({
