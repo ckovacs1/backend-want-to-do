@@ -7,6 +7,9 @@ const multer = require('multer');
 
 const Users = require('./routes/user');
 const app = express();
+const User = require('./models/User');
+
+const toDos = require('./models/WantToDos')
 
 app.use(cors());
 
@@ -44,6 +47,103 @@ app.get('/profile', (req, res) => {
       },
     ],
   });
+});
+
+
+app.post('/api/createtoDos', function(req, res){
+  const body = req.body
+
+  if (!body) {
+      return res.status(400).json({
+          success: false,
+          error: 'You must provide a todo',
+      })
+  }
+
+  const toDo = new toDos(req.body)
+
+  if (!toDo) {
+      return res.status(400).json({ success: false, error: err })
+  }
+
+  toDo
+      .save()
+      .then(() => {
+          return res.status(201).json({
+              success: true,
+              id: toDo._id,
+              message: 'todo created!',
+          })
+      })
+      .catch(error => {
+          return res.status(400).json({
+              error,
+              message: 'todo not created!',
+          })
+      })
+});
+
+app.get('/api/viewtoDos', async function(req, res){
+  await toDos.find({}, (err, alltoDos) => {
+    if (err) {
+        return res.status(400).json({ success: false, error: err })
+    }
+    if (!alltoDos.length) {
+        return res
+            .status(404)
+            .json({ success: false, error: `toDo not found` })
+    }
+    return res.status(200).json({ success: true, data: alltoDos })
+}).catch(err => console.log(err))
+});
+app.delete('/api/deletetoDos', async function(req, res){
+  await toDos.findOneAndDelete({ _id: req.params.id }, (err, toDo) => {
+    if (err) {
+        return res.status(400).json({ success: false, error: err })
+    }
+
+    if (!toDo) {
+        return res
+            .status(404)
+            .json({ success: false, error: `toDo not found` })
+    }
+
+    return res.status(200).json({ success: true, data: toDo })
+}).catch(err => console.log(err))
+});
+
+
+app.get('/api/viewtoDoById', async function(req, res){
+  await toDos.findOne({ _id: req.params.id }, (err, toDo) => {
+    if (err) {
+        return res.status(400).json({ success: false, error: err })
+    }
+
+    if (!toDo) {
+        return res
+            .status(404)
+            .json({ success: false, error: `toDo not found` })
+    }
+    return res.status(200).json({ success: true, data: toDo })
+}).catch(err => console.log(err))
+});
+
+
+//maybe add one where you update to show that you did it?
+
+
+app.get('/api/viewUsers', async function(req, res){
+  await User.find({}, (err, allUsers) => {
+    if (err) {
+        return res.status(400).json({ success: false, error: err })
+    }
+    if (!allUsers.length) {
+        return res
+            .status(404)
+            .json({ success: false, error: `User not found` })
+    }
+    return res.status(200).json({ success: true, data: allUsers })
+}).catch(err => console.log(err))
 });
 
 const port = 5000;
