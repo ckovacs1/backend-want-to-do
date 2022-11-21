@@ -1,17 +1,38 @@
 const express = require('express');
-const bodyParser = require('body-parser')
 const cors = require('cors');
+const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
+const passport = require('passport');
+const multer = require('multer');
 
+const Users = require('./routes/user');
 const app = express();
-
-app.use(bodyParser.urlencoded({extended: true}))
 
 app.use(cors());
 
-app.use(bodyParser.json())
-const db = require('./db')
+// Bodyparser middleware
+app.use(
+  bodyParser.urlencoded({
+    extended: false,
+  }),
+);
+app.use(bodyParser.json());
 
-db.on('error', console.error.bind(console, 'MongoDB connection error:'))
+const db =
+  'mongodb+srv://user:pass@wanttodos.wmvco30.mongodb.net/?retryWrites=true&w=majority';
+mongoose
+  .connect(db, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('Mongodb connection Successful'))
+  .catch(e => console.log(e));
+
+db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+
+app.use(passport.initialize());
+
+require('./config/passport')(passport);
+
+// Routes
+app.use('/api/users', Users);
 
 app.get('/profile', (req, res) => {
   res.json({
@@ -35,6 +56,5 @@ app.get('/profile', (req, res) => {
   });
 });
 
-app.listen(8080, () => {
-  console.log('Server on port 8080');
-});
+const port = 5000;
+app.listen(5000, () => console.log('Server on port 5000'));
