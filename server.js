@@ -25,8 +25,6 @@ mongoose
   .then(() => console.log('Mongodb connection Successful'))
   .catch(e => console.log(e));
 
-db.on('error', console.error.bind(console, 'MongoDB connection error:'));
-
 app.use(passport.initialize());
 
 require('./config/passport')(passport);
