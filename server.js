@@ -22,6 +22,10 @@ const db = require('./db');
 
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
+app.use( (req, res) => {
+  console.log(req.body)
+});
+
 app.use(passport.initialize());
 require('./config/passport')(passport);
 
@@ -191,9 +195,5 @@ app.post('/api/follow', async function(req,res) {
   // push (or unshift) 
   // return updated following array
 });
-
-
-no
-
 const port = 5000;
 app.listen(5000, () => console.log('Server on port 5000'));
