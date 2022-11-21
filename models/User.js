@@ -19,6 +19,13 @@ const UserSchema = new Schema({
     type: Date,
     default: Date.now,
   },
+  following: [
+    {type: mongoose.Types.ObjectId, ref: 'User'}
+  ],
+  followers: [
+    {type: mongoose.Types.ObjectId, ref: 'User'}
+  ],
+
 });
 
 const User = mongoose.model("user", UserSchema);
