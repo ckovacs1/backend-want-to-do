@@ -25,6 +25,9 @@ const UserSchema = new Schema({
   followers: [
     {type: mongoose.Types.ObjectId, ref: 'User'}
   ],
+  notifications: [
+    {type: mongoose.Types.ObjectId, ref: 'Notification'}
+  ]
 
 });
 
