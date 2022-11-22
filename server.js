@@ -10,10 +10,9 @@ const app = express();
 const User = require('./models/User');
 
 const toDos = require('./models/WantToDos');
-const Notifs = require("./models/FollowNotifications"); 
+const Notif = require("./models/FollowNotifications"); 
 
 app.use(cors());
-
 // Bodyparser middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -26,7 +25,6 @@ app.use( (req, res) => {
   console.log(req.body)
 });
 
-app.use(passport.initialize());
 require('./config/passport')(passport);
 
 // Routes
@@ -153,11 +151,18 @@ app.get('/api/viewUsers', async function(req, res){
 });
 
 app.get('/api/viewNotifs', async function(req,res) {
-  // User.findOne(logged in userID)
-  // populate notifications array 
-  // display notifications to user
+  await Notif.find({}, (err, allNotifs) => {
+    if (err) {
+        return res.status(400).json({ success: false, error: err })
+    }
+    if (!allNotifs.length) {
+        return res
+            .status(404)
+            .json({ success: false, error: `Notification not found` })
+    }
+    return res.status(200).json({ success: true, data: allNotifs})
+}).catch(err => console.log(err))
 });
-
 
 app.post('/api/updateNotifs', async function(req,res) {
   // interaction: mark as read or mark all as read
