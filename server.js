@@ -241,7 +241,7 @@ app.post('/api/unfollow', async function(req,res) {
 
   const loggedInFollow = friend1.following;
   const toDelete = loggedInFollow.indexOf(friend2);
-  loggedInFollow.splice(index, 1);
+  loggedInFollow.splice(toDelete, 1);
 
 });
 
@@ -260,6 +260,7 @@ app.get('/api/follow', async function(req,res) {
   User.updateOne({_id: friend2._id}, {$push: {"followers": friend1}});
   await friend2.save();
 
+  // populate for readability when handling response on FE 
   await User.find({}).populate("followers");
   await User.find({}).populate("following");
   
