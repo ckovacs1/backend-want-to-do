@@ -231,7 +231,8 @@ app.get('/api/viewFollowing', async function(req,res) {
   res.status(200).json({success: true, following: loggedInFollowing})
 });
 
-app.post('/api/unfollow', async function(req,res) {
+// should be POST 
+app.get('/api/unfollow', async function(req,res) {
   // some variable tht finds the user tht the logged in user wants to unfollow
   // suppose it's friend2
    // friend1 is the currently logged in user
@@ -242,6 +243,20 @@ app.post('/api/unfollow', async function(req,res) {
   const loggedInFollow = friend1.following;
   const toDelete = loggedInFollow.indexOf(friend2);
   loggedInFollow.splice(toDelete, 1);
+
+  await User.updateOne({_id: friend1._id}, {$set: {"following": loggedInFollow}});
+
+  const unfollowedUser = friend2.followers; 
+  const unfollowing = unfollowedUser.indexOf(friend2);
+  unfollowedUser.splice(unfollowing, 1);
+
+  await User.updateOne({_id: friend1._id}, {$set: {"following": unfollowedUser}});
+
+  await friend1.save();
+  await friend2.save();
+
+  return res.status(200).json({success: true, loggedInUser: friend1.following, followedUser: friend2.followers});
+
 
 });
 
