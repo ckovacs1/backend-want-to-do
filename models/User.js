@@ -20,13 +20,16 @@ const UserSchema = new Schema({
     default: Date.now,
   },
   following: [
-    {type: mongoose.Types.ObjectId, ref: 'User'}
+    {type: mongoose.Types.ObjectId, ref: 'user'}
   ],
   followers: [
-    {type: mongoose.Types.ObjectId, ref: 'User'}
+    {type: mongoose.Types.ObjectId, ref: 'user'}
   ],
   notifications: [
     {type: mongoose.Types.ObjectId, ref: 'Notification'}
+  ],
+  wantToDos: [
+    {type: mongoose.Types.ObjectId, ref: 'WantToDo'}
   ]
 
 });

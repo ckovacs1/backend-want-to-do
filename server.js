@@ -4,6 +4,8 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const passport = require('passport');
 const multer = require('multer');
+const session = require("express-session");
+const LocalStrategy = require('passport-local').Strategy;
 
 const Users = require('./routes/user');
 const app = express();
@@ -12,12 +14,11 @@ const User = require('./models/User');
 const toDos = require('./models/WantToDos');
 const Notif = require("./models/FollowNotifications"); 
 
-
 app.use(cors());
 
 app.use(
 	cors({
-		origin: function (origin, callback) {
+    origin: function (origin, callback) {
 			// allow requests with no origin
 			// (like mobile apps or curl requests)
 			if (!origin) return callback(null, true);
@@ -30,6 +31,11 @@ app.use(
 	})
 );
 
+app.use(session({
+  secret: 'WANT',
+  resave: false,
+  saveUninitialized: true,
+}));
 
 // Bodyparser middleware
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -39,11 +45,30 @@ const db = require('./db');
 
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
-app.use( (req, res) => {
-  console.log(req.body)
+app.use( (req, res ,next) => {
+  console.log(req.method, req.path, req.body, req.user)
+  next();
 });
 
+
 require('./config/passport')(passport);
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.serializeUser(function(user, done) {
+  done(null, user.id)
+});
+
+passport.deserializeUser(function(id, done) {
+  User.findById(id, function(err, user) {
+      done(err, user)
+  });
+});
+app.post('api/users/login', passport.authenticate('jwt', {
+  successRedirect: '/notification',
+  failureRedirect: '/login'}));
+
 
 // Routes
 app.use('/api/users', Users);
@@ -183,40 +208,66 @@ app.get('/api/viewNotifs', async function(req,res) {
 });
 
 app.post('/api/updateNotifs', async function(req,res) {
-  // interaction: mark as read or mark all as read
-
-  // User.findOne(logged in userID)
-  // populate notifications array 
-  // change {read: false} to {read: true}
-  // res.send updated notif(s)
+  const loggedInUserID = '';
 });
 
 app.get('/api/viewFollowers', async function(req,res) {
-  // User.findOne(logged in userID)
-  // populate followers array 
-  // return user followers
+   // friend1 is the currently logged in user
+   friend1 = await User.findOne({name: "Tester McTest"});
+   // friend2 is another user with an account 
+   friend2 = await User.findOne({name: "Friend McTest"});  
+
+  const loggedInFollowers = friend1.followers;
+  res.status(200).json({success: true, followers: loggedInFollowers})
 });
 
 app.get('/api/viewFollowing', async function(req,res) {
-  // User.findOne(logged in userID)
-  // populate following array 
-  // return following
+   // friend1 is the currently logged in user
+   friend1 = await User.findOne({name: "Tester McTest"});
+   // friend2 is another user with an account 
+   friend2 = await User.findOne({name: "Friend McTest"});  
+
+  const loggedInFollowing = friend1.following;
+  res.status(200).json({success: true, following: loggedInFollowing})
 });
 
 app.post('/api/unfollow', async function(req,res) {
-  // User.findOne(logged in userID)
-  // access following array 
-  // in following array, search for userID to be unfollowed 
-  // splice 
-  // return updated following array
+  // some variable tht finds the user tht the logged in user wants to unfollow
+  // suppose it's friend2
+   // friend1 is the currently logged in user
+   friend1 = await User.findOne({name: "Tester McTest"});
+   // friend2 is another user with an account 
+   friend2 = await User.findOne({name: "Friend McTest"});  
+
+  const loggedInFollow = friend1.following;
+  const toDelete = loggedInFollow.indexOf(friend2);
+  loggedInFollow.splice(index, 1);
+
 });
 
-app.post('/api/follow', async function(req,res) {
-  // User.findOne(logged in userID)
-  // access following array 
-  // in following array, search for userID to be followed 
-  // push (or unshift) 
-  // return updated following array
+app.get('/api/follow', async function(req,res) {
+  // friend1 is the currently logged in user
+  friend1 = await User.findOne({name: "Tester McTest"});
+  // friend2 is another user with an account 
+  friend2 = await User.findOne({name: "Friend McTest"});  
+
+  // following someone new
+  await User.updateOne({_id: friend1._id}, {$push: {"following": friend2}});
+  await friend1.save();
+
+  // when you follow someone, the person you recieve gets a new follower 
+  const newList2 = friend2.followers.unshift(friend1);
+  User.updateOne({_id: friend2._id}, {$push: {"followers": friend1}});
+  await friend2.save();
+
+  await User.find({}).populate("followers");
+  await User.find({}).populate("following");
+  
+  return res.status(200).json({success: true, loggedInUser: friend1.following, followedUser: friend2.followers});
+
+  // no error handling -> needs to be added
+
 });
+
 const port = 5000;
 app.listen(5000, () => console.log('Server on port 5000'));
