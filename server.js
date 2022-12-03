@@ -93,6 +93,88 @@ app.get('/api/viewNotifs', async function (req, res) {
   }).catch(err => console.log(err));
 });
 
+app.post('/api/addNotif', async function (req, res) {
+  // interaction: mark as read or mark all as read
+  // User.findOne(logged in userID)
+  // populate notifications array
+  // change {read: false} to {read: true}
+  // res.send updated notif(s)
+});
+
+app.get('/api/seeNotifs', async function (req, res) {
+  // interaction: mark as read or mark all as read
+  // User.findOne(logged in userID)
+  // populate notifications array
+  // change {read: false} to {read: true}
+  // res.send updated notif(s)
+});
+
+app.get('/api/setNotifAsRead/:id', async function (req, res) {
+  // interaction: mark as read or mark all as read
+  // User.findOne(logged in userID)
+  // populate notifications array
+  // change {read: false} to {read: true}
+  // res.send updated notif(s)
+});
+
+app.get(
+  '/api/viewFollowers',
+  passport.authenticate('jwt', { session: false }),
+  async function (req, res) {
+    if (!req.user.followers) {
+      return res.status(400).json({ success: false, error: 'err' });
+    } else if (req.user.following.length === 0) {
+      return res.status(200).json({ success: false, followers: [] });
+    }
+
+    User.findOne({ _id: req.user.id })
+      .populate('followers')
+      .exec(function (err, user) {
+        if (err) return res.status(400).json({ success: false, error: err });
+        return res
+          .status(400)
+          .json({ success: true, followers: user.followers });
+      });
+  },
+);
+
+app.get(
+  '/api/viewFollowing',
+  passport.authenticate('jwt', { session: false }),
+  async function (req, res) {
+    if (!req.user.following) {
+      return res.status(400).json({ success: false, error: 'err' });
+    } else if (req.user.following.length === 0) {
+      return res.status(200).json({ success: false, following: [] });
+    }
+
+    User.findOne({ _id: req.user.id })
+      .populate('following')
+      .exec(function (err, user) {
+        if (err) return res.status(400).json({ success: false, error: err });
+        return res
+          .status(400)
+          .json({ success: true, following: user.following });
+      });
+  },
+);
+
+app.post('/api/unfollow', async function (req, res) {
+  // User.findOne(logged in userID)
+  // access following array
+  // in following array, search for userID to be unfollowed
+  // splice
+  // return updated following array
+});
+
+app.post('/api/follow', async function (req, res) {
+  // User.findOne(logged in userID)
+  // access following array
+  // in following array, search for userID to be followed
+  // push (or unshift)
+  // return updated following array
+});
+
 //get user id
 app.get(
   '/api/test/token',

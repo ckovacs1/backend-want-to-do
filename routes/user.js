@@ -55,6 +55,7 @@ router.post('/login', (req, res) => {
         const payload = {
           id: user.id,
           name: user.name,
+          doucment: user,
         };
         jwt.sign(
           payload,
@@ -77,51 +78,5 @@ router.post('/login', (req, res) => {
     });
   });
 });
-
-router.post('/api/updateNotifs', async function (req, res) {
-  // interaction: mark as read or mark all as read
-  // User.findOne(logged in userID)
-  // populate notifications array
-  // change {read: false} to {read: true}
-  // res.send updated notif(s)
-});
-
-router.get('/api/viewFollowers', async function (req, res) {
-  // User.findOne(logged in userID)
-  // populate followers array
-  // return user followers
-});
-
-router.get('/api/viewFollowing', async function (req, res) {
-  // User.findOne(logged in userID)
-  // populate following array
-  // return following
-});
-
-router.post('/api/unfollow', async function (req, res) {
-  // User.findOne(logged in userID)
-  // access following array
-  // in following array, search for userID to be unfollowed
-  // splice
-  // return updated following array
-});
-
-router.post('/api/follow', async function (req, res) {
-  // User.findOne(logged in userID)
-  // access following array
-  // in following array, search for userID to be followed
-  // push (or unshift)
-  // return updated following array
-});
-
-router.get(
-  '/api/test/token',
-  //use this authenticate middleware to get user id and info
-  passport.authenticate('jwt', { session: false }),
-  async function (req, res) {
-    console.log(req.user);
-    return res.status(200).json({ success: true });
-  },
-);
 
 module.exports = router;
