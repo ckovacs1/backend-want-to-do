@@ -222,7 +222,7 @@ app.post(
 
     // retrieve, edit, and set the unfollowed user's follower list
     User.findOne({ _id: req.params.id }, async function (err, found) {
-      if (err) res.status(400).json({ success: false, error: err });
+      if (err) return res.status(400).json({ success: false, error: err });
       if (!found) {
         return res
           .status(400)
@@ -243,7 +243,7 @@ app.post(
     });
     // retrieve, edit, and set the user who unfollowed's follower list
     User.findOne({ _id: req.user.id }, async function (err, found) {
-      if (err) res.status(400).json({ success: false, error: err });
+      if (err) return res.status(400).json({ success: false, error: err });
       if (!found) {
         return res
           .status(400)
@@ -271,7 +271,9 @@ app.post(
   passport.authenticate('jwt', { session: false }),
   async function (req, res) {
     if (!req.params.id) {
-      return res.status(400).json({ success: false, error: err });
+      return res
+        .status(400)
+        .json({ success: false, error: 'No user id provided' });
     }
 
     const toFollowID = req.params.id;
@@ -291,6 +293,51 @@ app.post(
     );
 
     return res.status(200).json({ success: true });
+  },
+);
+
+app.get(
+  '/api/viewOtherProfile/:id',
+  passport.authenticate('jwt', { session: false }),
+  async function (req, res) {
+    if (!req.params.id) {
+      return res
+        .status(400)
+        .json({ success: false, error: 'No user id provided' });
+    }
+
+    if (req.params.id === req.user.id) {
+      // to do
+    }
+
+    User.findOne({ _id: req.params.id }, async function (err, found) {
+      if (err) return res.status(400).json({ success: false, error: err });
+      if (!found)
+        return res.status(400).json({ success: false, error: 'No user found' });
+
+      const loggedIn = await User.findOne({ _id: req.user.id });
+      if (loggedIn.following.indexOf(found._id) === -1) {
+        return res.status(200).json({
+          success: true,
+
+          data: {
+            name: found.name,
+            following: found.following,
+            followers: found.followers,
+          },
+        }); // send less informatuion than if the user were following
+      }
+      return res.status(200).json({
+        success: true,
+        data: {
+          desc: 'you follow this user!',
+          name: found.name,
+          following: found.following,
+          followers: found.followers,
+          wantToDos: found.wantToDos,
+        },
+      });
+    });
   },
 );
 
