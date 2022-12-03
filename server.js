@@ -67,7 +67,6 @@ app.get('/profile', (req, res) => {
   });
 });
 
-
 app.get('/api/viewUsers', async function (req, res) {
   await User.find({}, (err, allUsers) => {
     if (err) {
@@ -92,42 +91,6 @@ app.get('/api/viewNotifs', async function (req, res) {
     }
     return res.status(200).json({ success: true, data: allNotifs });
   }).catch(err => console.log(err));
-});
-
-app.post('/api/updateNotifs', async function (req, res) {
-  // interaction: mark as read or mark all as read
-  // User.findOne(logged in userID)
-  // populate notifications array
-  // change {read: false} to {read: true}
-  // res.send updated notif(s)
-});
-
-app.get('/api/viewFollowers', async function (req, res) {
-  // User.findOne(logged in userID)
-  // populate followers array
-  // return user followers
-});
-
-app.get('/api/viewFollowing', async function (req, res) {
-  // User.findOne(logged in userID)
-  // populate following array
-  // return following
-});
-
-app.post('/api/unfollow', async function (req, res) {
-  // User.findOne(logged in userID)
-  // access following array
-  // in following array, search for userID to be unfollowed
-  // splice
-  // return updated following array
-});
-
-app.post('/api/follow', async function (req, res) {
-  // User.findOne(logged in userID)
-  // access following array
-  // in following array, search for userID to be followed
-  // push (or unshift)
-  // return updated following array
 });
 
 //get user id
