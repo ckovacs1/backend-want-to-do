@@ -93,21 +93,48 @@ app.get('/api/viewNotifs', async function (req, res) {
   }).catch(err => console.log(err));
 });
 
-app.post('/api/addNotif', async function (req, res) {
-  // interaction: mark as read or mark all as read
-  // User.findOne(logged in userID)
-  // populate notifications array
-  // change {read: false} to {read: true}
-  // res.send updated notif(s)
-});
+app.post(
+  '/api/addNotif/:id',
+  passport.authenticate('jwt', { session: false }),
+  async function (req, res) {
+    const newFollower = await User.findOne({ _id: req.params.id });
 
-app.get('/api/seeNotifs', async function (req, res) {
-  // interaction: mark as read or mark all as read
-  // User.findOne(logged in userID)
-  // populate notifications array
-  // change {read: false} to {read: true}
-  // res.send updated notif(s)
-});
+    if (!newFollower) {
+      return res
+        .status(400)
+        .json({ success: false, error: "User id doesn't exist" });
+    }
+
+    const newNotif = new Notif({
+      read: false,
+      title: 'You have a new follower',
+      description: {
+        date: Date.now(),
+        follower: newFollower,
+      },
+    });
+
+    newNotif.save(function (err, saved) {
+      if (err) {
+        return res.status(400).json({
+          success: false,
+          error: 'There was an error saving the notification',
+        });
+      }
+      User.findOneAndUpdate(
+        { _id: req.user.id },
+        { $push: { notifications: saved } },
+        function (err, user) {
+          if (err) return err;
+          return res.status(200).json({
+            success: true,
+            data: user.notifications,
+          });
+        },
+      );
+    });
+  },
+);
 
 app.get('/api/setNotifAsRead/:id', async function (req, res) {
   // interaction: mark as read or mark all as read
@@ -153,27 +180,45 @@ app.get(
       .exec(function (err, user) {
         if (err) return res.status(400).json({ success: false, error: err });
         return res
-          .status(400)
+          .status(200)
           .json({ success: true, following: user.following });
       });
   },
 );
 
-app.post('/api/unfollow', async function (req, res) {
-  // User.findOne(logged in userID)
-  // access following array
-  // in following array, search for userID to be unfollowed
-  // splice
-  // return updated following array
-});
+app.post(
+  '/api/unfollow/:id',
+  passport.authenticate('jwt', { session: false }),
+  async function (req, res) {},
+);
 
-app.post('/api/follow', async function (req, res) {
-  // User.findOne(logged in userID)
-  // access following array
-  // in following array, search for userID to be followed
-  // push (or unshift)
-  // return updated following array
-});
+app.post(
+  '/api/follow/:id',
+  passport.authenticate('jwt', { session: false }),
+  async function (req, res) {
+    if (!req.params.id) {
+      if (err) return res.status(400).json({ success: false, error: err });
+    }
+
+    const toFollowID = req.params.id;
+    const loggedInUser = await User.findOne({ _id: req.user.id });
+    const toFollowUser = await User.findOneAndUpdate(
+      { _id: toFollowID },
+      { $push: { followers: loggedInUser } },
+    );
+
+    if (!toFollowUser) {
+      return res.status(400).json({ success: false, error: 'err' });
+    }
+
+    const updateUser = await User.findOneAndUpdate(
+      { _id: req.user._id }, // return data here?
+      { $push: { following: toFollowUser } },
+    );
+
+    return res.status(200).json({ success: true });
+  },
+);
 
 //get user id
 app.get(
