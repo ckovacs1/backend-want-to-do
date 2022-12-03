@@ -67,6 +67,23 @@ app.get('/profile', (req, res) => {
   });
 });
 
+app.get(
+  '/api/loggedInUserInfo',
+  passport.authenticate('jwt', { session: false }),
+  async function (req, res) {
+    if (!req.user) {
+      return res.status(404).json({ success: false, error: `User not found` });
+    }
+
+    const userInfo = await User.findOne({ _id: req.user.id });
+    if (!userInfo) {
+      return res.status(404).json({ success: false, error: `User not found` });
+    }
+
+    return res.status(200).json({ success: true, data: userInfo });
+  },
+);
+
 app.get('/api/viewUsers', async function (req, res) {
   await User.find({}, (err, allUsers) => {
     if (err) {
