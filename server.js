@@ -94,12 +94,15 @@ app.get('/api/viewNotifs', async function (req, res) {
 });
 
 app.post(
-  '/api/newFollowingNotif/:id',
+  '/api/newFollowerNotif/:id',
   passport.authenticate('jwt', { session: false }),
   async function (req, res) {
-    const newFollower = await User.findOne({ _id: req.params.id });
+    // logged in user user is the one that folows
+    // other user is the one that recieves the notif
+    const getsNotif = await User.findOne({ _id: req.params.id });
+    const newFollower = await User.findOne({ _id: req.user.id });
 
-    if (!newFollower) {
+    if (!getsNotif) {
       return res
         .status(400)
         .json({ success: false, error: "User id doesn't exist" });
@@ -122,13 +125,13 @@ app.post(
         });
       }
       User.findOneAndUpdate(
-        { _id: req.user.id },
+        { _id: req.params.id },
         { $push: { notifications: saved } },
         function (err, user) {
           if (err) return err;
           return res.status(200).json({
             success: true,
-            data: user.notifications,
+            data: { initiatedFollow: newFollower, recievedNewFollower: user },
           });
         },
       );
