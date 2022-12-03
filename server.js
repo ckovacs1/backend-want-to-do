@@ -43,7 +43,7 @@ require('./config/passport')(passport);
 
 // Routes
 app.use('/api/users', Users);
-app.use('/api', toDos);
+app.use('/api/todos', toDos);
 
 app.get('/profile', (req, res) => {
   res.json({

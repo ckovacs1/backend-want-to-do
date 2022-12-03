@@ -16,7 +16,7 @@ const express = require('express'),
 router.use(isAuthenticated) */
 
 
-router.post('createtoDos', function (req, res) {
+router.post('/createtoDos', function (req, res) {
     const body = req.body;
   
     if (!body) {
@@ -65,7 +65,7 @@ router.post('createtoDos', function (req, res) {
       .catch(err => console.log(err));
   });
   
-  router.delete('deletetoDos/:id', async function (req, res) {
+  router.delete('/deletetoDos/:id', async function (req, res) {
     await toDos
       .findOneAndDelete({ _id: req.params.id }, (err, toDo) => {
         if (err) {
@@ -83,7 +83,7 @@ router.post('createtoDos', function (req, res) {
       .catch(err => console.log(err));
   });
   
-  router.get('viewtoDoById/:id', async function (req, res) {
+  router.get('/viewtoDoById/:id', async function (req, res) {
     await toDos
       .findOne({ _id: req.params.id }, (err, toDo) => {
         if (err) {
@@ -101,7 +101,7 @@ router.post('createtoDos', function (req, res) {
   });
   
   
-  router.put('completetoDo/:id', async function (req, res){
+  router.put('/completetoDo/:id', async function (req, res){
       const body = req.body
   
       if (!body) {
