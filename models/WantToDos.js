@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 // types all based on frontend data types 
 const WantToDoSchema = new mongoose.Schema({
     // _id by default
+    user: {type: mongoose.Schema.Types.ObjectId, ref:'User'},
     title: {type: String, default: "Untitled Want-To-Do"},
     description: String, // assume it's not required 
     startDateTime: {type: Date, default: Date.now},
@@ -13,7 +14,7 @@ const WantToDoSchema = new mongoose.Schema({
     repeatOn: [String],
     category: {type: String, required: true},
     complete: {type: Boolean, default: false}
-    //inviteFriends: [{type: mongoose.Types.ObjectId, ref: 'User'}]
+
 });
 
 const toDos = mongoose.model('WantToDo', WantToDoSchema);

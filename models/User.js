@@ -27,7 +27,8 @@ const UserSchema = new Schema({
   ],
   notifications: [
     {type: mongoose.Types.ObjectId, ref: 'Notification'}
-  ]
+  ],
+  toDos:  [{ type: mongoose.Schema.Types.ObjectId, ref: 'toDos' }]
 
 });
 
