@@ -181,18 +181,14 @@ app.get(
   async function (req, res) {
     if (!req.user.followers) {
       return res.status(400).json({ success: false, error: 'err' });
-    } else if (req.user.following.length === 0) {
+    } else if (req.user.followers.length === 0) {
       return res.status(200).json({ success: false, followers: [] });
     }
 
-    User.findOne({ _id: req.user.id })
-      .populate('followers')
-      .exec(function (err, user) {
-        if (err) return res.status(400).json({ success: false, error: err });
-        return res
-          .status(400)
-          .json({ success: true, followers: user.followers });
-      });
+    User.findOne({ _id: req.user.id }).exec(function (err, user) {
+      if (err) return res.status(400).json({ success: false, error: err });
+      return res.status(400).json({ success: true, followers: user.followers });
+    });
   },
 );
 
@@ -206,21 +202,68 @@ app.get(
       return res.status(200).json({ success: false, following: [] });
     }
 
-    User.findOne({ _id: req.user.id })
-      .populate('following')
-      .exec(function (err, user) {
-        if (err) return res.status(400).json({ success: false, error: err });
-        return res
-          .status(200)
-          .json({ success: true, following: user.following });
-      });
+    User.findOne({ _id: req.user.id }).exec(function (err, user) {
+      if (err) return res.status(400).json({ success: false, error: err });
+      return res.status(200).json({ success: true, following: user.following });
+    });
   },
 );
 
 app.post(
   '/api/unfollow/:id',
   passport.authenticate('jwt', { session: false }),
-  async function (req, res) {},
+  async function (req, res) {
+    // logged in user chooses to unfollow user :id
+    if (!req.params.id) {
+      return res
+        .status(400)
+        .json({ success: false, error: 'No user id provided' });
+    }
+
+    // retrieve, edit, and set the unfollowed user's follower list
+    User.findOne({ _id: req.params.id }, async function (err, found) {
+      if (err) res.status(400).json({ success: false, error: err });
+      if (!found) {
+        return res
+          .status(400)
+          .json({ success: false, error: 'User not found' });
+      }
+      const removeFollowerIdx = found.followers.indexOf(req.user.id);
+
+      if (removeFollowerIdx === -1) {
+        return res
+          .status(400)
+          .json({ success: false, error: 'Invalid follower' });
+      }
+      const newFollowerList = found.followers.splice(removeFollowerIdx, 1);
+      await User.findOneAndUpdate(
+        { _id: req.params.id },
+        { $set: { followers: newFollowerList } },
+      );
+    });
+    // retrieve, edit, and set the user who unfollowed's follower list
+    User.findOne({ _id: req.user.id }, async function (err, found) {
+      if (err) res.status(400).json({ success: false, error: err });
+      if (!found) {
+        return res
+          .status(400)
+          .json({ success: false, error: 'User not found' });
+      }
+      const removeFollowingIdx = found.following.indexOf(req.params.id);
+
+      if (removeFollowingIdx === -1) {
+        return res
+          .status(400)
+          .json({ success: false, error: 'Invalid follower' });
+      }
+      const newFollowingList = found.following.splice(removeFollowingIdx, 1);
+      await User.findOneAndUpdate(
+        { _id: req.user.id },
+        { $set: { following: newFollowingList } },
+      );
+    });
+    return res.status(200).json({ success: true });
+  },
 );
 
 app.post(
@@ -228,7 +271,7 @@ app.post(
   passport.authenticate('jwt', { session: false }),
   async function (req, res) {
     if (!req.params.id) {
-      if (err) return res.status(400).json({ success: false, error: err });
+      return res.status(400).json({ success: false, error: err });
     }
 
     const toFollowID = req.params.id;
