@@ -94,7 +94,7 @@ app.get('/api/viewNotifs', async function (req, res) {
 });
 
 app.post(
-  '/api/addNotif/:id',
+  '/api/newFollowingNotif/:id',
   passport.authenticate('jwt', { session: false }),
   async function (req, res) {
     const newFollower = await User.findOne({ _id: req.params.id });
@@ -136,12 +136,23 @@ app.post(
   },
 );
 
-app.get('/api/setNotifAsRead/:id', async function (req, res) {
-  // interaction: mark as read or mark all as read
-  // User.findOne(logged in userID)
-  // populate notifications array
-  // change {read: false} to {read: true}
-  // res.send updated notif(s)
+app.post('/api/setNotifAsRead/:id', async function (req, res) {
+  // find a notification by notification id
+  // assigns its value as read
+  if (!req.params.id) {
+    return res.status(400).json({ success: false, error: 'No id in param' });
+  }
+  const getNotif = Notif.findOneAndUpdate(
+    { _id: req.params.id },
+    { $set: { read: true } },
+  );
+
+  if (!getNotif) {
+    return res
+      .status(400)
+      .json({ success: false, error: 'Notif does not exist' });
+  }
+  return res.status(400).json({ success: true });
 });
 
 app.get(
