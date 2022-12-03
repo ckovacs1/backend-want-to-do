@@ -40,10 +40,21 @@ const db = require('./db');
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
 require('./config/passport')(passport);
+/* // passport setup
+app.use(passport.initialize());
+app.use(passport.session());
+
+// make user data available to all templates
+app.use((req, res, next) => {
+  res.locals.user = req.user;
+  next();
+}); */
 
 // Routes
 app.use('/api/users', Users);
 app.use('/api/todos', toDos);
+
+
 
 app.get('/profile', (req, res) => {
   res.json({

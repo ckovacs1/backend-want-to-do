@@ -2,7 +2,8 @@ const express = require('express'),
 	router = express.Router(),
 	mongoose = require('mongoose'),
 	toDos = require('../models/WantToDos');
-
+const passport = require('passport')
+require('../config/passport')(passport);
 
 /* const isAuthenticated = (req, res, next) => {
   if(!req.user) {
@@ -16,7 +17,7 @@ const express = require('express'),
 router.use(isAuthenticated) */
 
 
-router.post('/createtoDos', function (req, res) {
+router.post('/createtoDos', passport.authenticate('jwt', { session: false }), function (req, res) {
     const body = req.body;
   
     if (!body) {
@@ -27,6 +28,9 @@ router.post('/createtoDos', function (req, res) {
     }
   
     const toDo = new toDos(req.body);
+    toDo.user = req.user.id;
+    //replace ^ with user id that we keep track of
+    //req.user._id
   
     if (!toDo) {
       return res.status(400).json({ success: false, error: err });
@@ -49,9 +53,9 @@ router.post('/createtoDos', function (req, res) {
       });
   });
   
-  router.get('/viewtoDos', async function (req, res) {
+  router.get('/viewtoDos', passport.authenticate('jwt', { session: false }), async function (req, res) {
     await toDos
-      .find({}, (err, alltoDos) => {
+      .find({user: req.user.id}, (err, alltoDos) => {
         if (err) {
           return res.status(400).json({ success: false, error: err });
         }
@@ -65,9 +69,9 @@ router.post('/createtoDos', function (req, res) {
       .catch(err => console.log(err));
   });
   
-  router.delete('/deletetoDos/:id', async function (req, res) {
+  router.delete('/deletetoDos/:id', passport.authenticate('jwt', { session: false }), async function (req, res) {
     await toDos
-      .findOneAndDelete({ _id: req.params.id }, (err, toDo) => {
+      .findOneAndDelete({ user: req.user.id, _id: req.params.id }, (err, toDo) => {
         if (err) {
           return res.status(400).json({ success: false, error: err });
         }
@@ -83,9 +87,9 @@ router.post('/createtoDos', function (req, res) {
       .catch(err => console.log(err));
   });
   
-  router.get('/viewtoDoById/:id', async function (req, res) {
+  router.get('/viewtoDoById/:id', passport.authenticate('jwt', { session: false }), async function (req, res) {
     await toDos
-      .findOne({ _id: req.params.id }, (err, toDo) => {
+      .findOne({ user: req.user.id, _id: req.params.id }, (err, toDo) => {
         if (err) {
           return res.status(400).json({ success: false, error: err });
         }
@@ -101,7 +105,7 @@ router.post('/createtoDos', function (req, res) {
   });
   
   
-  router.put('/completetoDo/:id', async function (req, res){
+  router.put('/completetoDo/:id', passport.authenticate('jwt', { session: false }), async function (req, res){
       const body = req.body
   
       if (!body) {
@@ -110,7 +114,7 @@ router.post('/createtoDos', function (req, res) {
               error: 'You must provide a body to update',
           })
       }
-      toDos.findOne({ _id: req.params.id }, (err, toDo) => {
+      toDos.findOne({ user: req.user.id, _id: req.params.id }, (err, toDo) => {
           if (err) {
               return res.status(404).json({
                   err,
@@ -135,5 +139,22 @@ router.post('/createtoDos', function (req, res) {
               })
       })
   });
+
+/*   router.get('/viewtoDoByUserId/:id', async function (req, res) {
+    await toDos
+      .find({ user: req.params.id }, (err, toDo) => {
+        if (err) {
+          return res.status(400).json({ success: false, error: err });
+        }
+  
+        if (!toDo) {
+          return res
+            .status(404)
+            .json({ success: false, error: `toDo not found` });
+        }
+        return res.status(200).json({ success: true, data: toDo });
+      })
+      .catch(err => console.log(err));
+  }); */
 
 module.exports = router
