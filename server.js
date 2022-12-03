@@ -114,7 +114,7 @@ app.get('/api/viewtoDos', async function (req, res) {
     .catch(err => console.log(err));
 });
 
-app.delete('/api/deletetoDos', async function (req, res) {
+app.delete('/api/deletetoDos/:id', async function (req, res) {
   await toDos
     .findOneAndDelete({ _id: req.params.id }, (err, toDo) => {
       if (err) {
@@ -132,7 +132,7 @@ app.delete('/api/deletetoDos', async function (req, res) {
     .catch(err => console.log(err));
 });
 
-app.get('/api/viewtoDoById', async function (req, res) {
+app.get('/api/viewtoDoById/:id', async function (req, res) {
   await toDos
     .findOne({ _id: req.params.id }, (err, toDo) => {
       if (err) {
@@ -150,7 +150,9 @@ app.get('/api/viewtoDoById', async function (req, res) {
 });
 
 
-app.put('/api/completetoDo', async function (req, res){
+
+
+app.put('/api/completetoDo/:id', async function (req, res){
     const body = req.body
 
     if (!body) {
@@ -159,14 +161,14 @@ app.put('/api/completetoDo', async function (req, res){
             error: 'You must provide a body to update',
         })
     }
-    Movie.findOne({ _id: req.params.id }, (err, toDo) => {
+    toDos.findOne({ _id: req.params.id }, (err, toDo) => {
         if (err) {
             return res.status(404).json({
                 err,
                 message: 'toDo not found!',
             })
         }
-        toDo.complete = body.complete;
+        toDo.complete = true;
         toDo
             .save()
             .then(() => {
