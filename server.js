@@ -149,6 +149,42 @@ app.get('/api/viewtoDoById', async function (req, res) {
     .catch(err => console.log(err));
 });
 
+
+app.put('/api/completetoDo', async function (req, res){
+    const body = req.body
+
+    if (!body) {
+        return res.status(400).json({
+            success: false,
+            error: 'You must provide a body to update',
+        })
+    }
+    Movie.findOne({ _id: req.params.id }, (err, toDo) => {
+        if (err) {
+            return res.status(404).json({
+                err,
+                message: 'toDo not found!',
+            })
+        }
+        toDo.complete = body.complete;
+        toDo
+            .save()
+            .then(() => {
+                return res.status(200).json({
+                    success: true,
+                    id: toDo._id,
+                    message: 'toDo updated!',
+                })
+            })
+            .catch(error => {
+                return res.status(404).json({
+                    error,
+                    message: 'toDo not updated!',
+                })
+            })
+    })
+});
+
 //maybe add one where you update to show that you did it?
 
 app.get('/api/viewUsers', async function (req, res) {

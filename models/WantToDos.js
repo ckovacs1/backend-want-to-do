@@ -12,6 +12,7 @@ const WantToDoSchema = new mongoose.Schema({
     repetition: {type: Boolean}, // looks like repition value is a string
     repeatOn: [String],
     category: {type: String, required: true},
+    complete: {type: Boolean, default: false}
     //inviteFriends: [{type: mongoose.Types.ObjectId, ref: 'User'}]
 });
 
