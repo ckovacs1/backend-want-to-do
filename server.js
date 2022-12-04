@@ -106,6 +106,7 @@ app.get('/api/viewUsers', async function (req, res) {
 });
 
 app.get('/api/viewNotifs', async function (req, res) {
+  // ALL EXISTING NOTIFS - NOT JUST NOTIFS FOR LOGGED IN USER!
   await Notif.find({}, (err, allNotifs) => {
     if (err) {
       return res.status(400).json({ success: false, error: err });
@@ -333,20 +334,16 @@ app.get(
           success: true,
 
           data: {
-            name: found.name,
-            following: found.following,
-            followers: found.followers,
+            isFollowing: false,
+            other: found,
           },
         }); // send less informatuion than if the user were following
       }
       return res.status(200).json({
         success: true,
         data: {
-          desc: 'you follow this user!',
-          name: found.name,
-          following: found.following,
-          followers: found.followers,
-          wantToDos: found.wantToDos,
+          isFollowing: true,
+          other: found,
         },
       });
     });
