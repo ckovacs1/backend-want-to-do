@@ -54,8 +54,6 @@ app.use((req, res, next) => {
 app.use('/api/users', Users);
 app.use('/api/todos', toDos);
 
-
-
 app.get('/profile', (req, res) => {
   res.json({
     profiles: [
@@ -183,7 +181,7 @@ app.post('/api/setNotifAsRead/:id', async function (req, res) {
       .status(400)
       .json({ success: false, error: 'Notif does not exist' });
   }
-  return res.status(400).json({ success: true });
+  return res.status(200).json({ success: true });
 });
 
 app.get(
@@ -198,7 +196,7 @@ app.get(
 
     User.findOne({ _id: req.user.id }).exec(function (err, user) {
       if (err) return res.status(400).json({ success: false, error: err });
-      return res.status(400).json({ success: true, followers: user.followers });
+      return res.status(200).json({ success: true, followers: user.followers });
     });
   },
 );
