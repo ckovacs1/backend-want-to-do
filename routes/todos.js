@@ -5,6 +5,30 @@ const express = require('express'),
 const passport = require('passport')
 require('../config/passport')(passport);
 
+const currentMonth = new Date().getMonth();
+console.log(currentMonth);
+
+const currentYear = new Date().getFullYear();
+console.log(currentYear);
+
+const currentDay = new Date().getDate();
+console.log(currentDay);
+
+const fromDateM = new Date(currentYear, currentMonth, 1);
+const toDateM = new Date(fromDateM.getFullYear(), fromDateM.getMonth() + 1, 0);
+
+const fromDateW = new Date(currentYear, currentMonth, currentDay);
+const toDateW = new Date(fromDateW.getFullYear(), fromDateW.getMonth(), currentDay+7);
+
+const fromDateD = new Date(currentYear, currentMonth, currentDay);
+const toDateD = new Date(fromDateD.getFullYear(), fromDateD.getMonth(), currentDay+1);
+
+console.log(fromDateD);
+console.log(toDateD);
+const conditionM = {startDateTime: {'$gte': fromDateM, '$lte': toDateM}};
+const conditionW = {"startDateTime": {'$gte': fromDateW, '$lte': toDateW}};
+const conditionD = {"startDateTime": {'$gte': fromDateD, '$lte': toDateD}};
+
 /* const isAuthenticated = (req, res, next) => {
   if(!req.user) {
     res.redirect('/'); 
@@ -53,9 +77,61 @@ router.post('/createtoDos', passport.authenticate('jwt', { session: false }), fu
       });
   });
   
+  //if want only view unfinished to-dos, do a .find with added complete: false in find parameter
   router.get('/viewtoDos', passport.authenticate('jwt', { session: false }), async function (req, res) {
     await toDos
       .find({user: req.user.id}, (err, alltoDos) => {
+        if (err) {
+          return res.status(400).json({ success: false, error: err });
+        }
+        if (!alltoDos.length) {
+          return res
+            .status(404)
+            .json({ success: false, error: `toDo not found` });
+        }
+        return res.status(200).json({ success: true, data: alltoDos });
+      })
+      .catch(err => console.log(err));
+  });
+
+  //current month
+  router.get('/viewtoDosMonth', passport.authenticate('jwt', { session: false }), async function (req, res) {
+    await toDos
+      .find({user: req.user.id, startDateTime: {'$gte': fromDateM, '$lte': toDateM}}, (err, alltoDos) => {
+        if (err) {
+          return res.status(400).json({ success: false, error: err });
+        }
+        if (!alltoDos.length) {
+          return res
+            .status(404)
+            .json({ success: false, error: `toDo not found` });
+        }
+        return res.status(200).json({ success: true, data: alltoDos });
+      })
+      .catch(err => console.log(err));
+  });
+
+  //7 days ahead
+  router.get('/viewtoDosWeek', passport.authenticate('jwt', { session: false }), async function (req, res) {
+    await toDos
+      .find({user: req.user.id, startDateTime: {'$gte': fromDateW, '$lte': toDateW}}, (err, alltoDos) => {
+        if (err) {
+          return res.status(400).json({ success: false, error: err });
+        }
+        if (!alltoDos.length) {
+          return res
+            .status(404)
+            .json({ success: false, error: `toDo not found` });
+        }
+        return res.status(200).json({ success: true, data: alltoDos });
+      })
+      .catch(err => console.log(err));
+  });
+
+  //2 days ahead
+  router.get('/viewtoDosDay', passport.authenticate('jwt', { session: false }), async function (req, res) {
+    await toDos
+      .find({user: req.user.id, startDateTime: {'$gte': fromDateD, '$lte': toDateD}}, (err, alltoDos) => {
         if (err) {
           return res.status(400).json({ success: false, error: err });
         }
