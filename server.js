@@ -191,7 +191,7 @@ app.get(
     if (!req.user.followers) {
       return res.status(400).json({ success: false, error: 'err' });
     } else if (req.user.followers.length === 0) {
-      return res.status(200).json({ success: false, followers: [] });
+      return res.status(200).json({ success: true, followers: [] });
     }
 
     User.find({ _id: { $in: req.user.followers } }).exec(function (
@@ -382,7 +382,9 @@ app.post(
       });
     }
 
-    return res.status(200).json({ success: true });
+    return res
+      .status(200)
+      .json({ success: true, message: 'password successfully changed!' });
   },
 );
 
