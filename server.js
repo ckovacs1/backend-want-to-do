@@ -194,9 +194,12 @@ app.get(
       return res.status(200).json({ success: false, followers: [] });
     }
 
-    User.findOne({ _id: req.user.id }).exec(function (err, user) {
+    User.find({ _id: { $in: req.user.followers } }).exec(function (
+      err,
+      followers,
+    ) {
       if (err) return res.status(400).json({ success: false, error: err });
-      return res.status(200).json({ success: true, followers: user.followers });
+      return res.status(200).json({ success: true, followers });
     });
   },
 );
