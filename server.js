@@ -422,6 +422,7 @@ app.post(
       .json({ success: true, message: 'Name changed successfully!' });
   },
 );
+
 app.get(
   '/api/searchUserByEmail',
   passport.authenticate('jwt', { session: false }),
@@ -444,6 +445,7 @@ app.get(
     });
   },
 );
+
 
 //get user id
 app.get(
