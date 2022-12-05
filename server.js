@@ -423,6 +423,30 @@ app.post(
   },
 );
 
+app.get(
+  '/api/searchUserByEmail',
+  passport.authenticate('jwt', { session: false }),
+  // searches for a SINGLE USER
+  async function (req, res) {
+    if (!req.body.searchEmail) {
+      return res
+        .status(400)
+        .json({ success: false, err: 'Search query left empty' });
+    }
+    User.findOne({ email: req.body.searchEmail }, function (err, found) {
+      if (err) return res.status(400).json({ success: false, err: err });
+      if (!found) {
+        return res.status(200).json({
+          success: true,
+          message: 'No user with the searched email was found.',
+        });
+      }
+      return res.status(200).json({ success: true, found: found });
+    });
+  },
+);
+
+
 //get user id
 app.get(
   '/api/test/token',
