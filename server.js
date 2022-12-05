@@ -385,6 +385,66 @@ app.post(
   },
 );
 
+app.post(
+  '/api/changeName',
+  //use this authenticate middleware to get user id and info
+  passport.authenticate('jwt', { session: false }),
+  async function (req, res) {
+    if (!(req.body.newFirst && req.body.newLast)) {
+      return res.status(400).json({
+        success: false,
+        error: "Please select what part of your name you'd like to change.",
+      });
+    }
+
+    if (req.body.newFirst) {
+      User.findOneAndUpdate(
+        { _id: req.user.id },
+        { $set: { name: { first: req.body.newFirst } } },
+        function (err) {
+          if (err) return res.status(400).json({ success: false, err: err });
+        },
+      );
+    }
+
+    if (req.body.newLast) {
+      User.findOneAndUpdate(
+        { _id: req.user.id },
+        { $set: { name: { last: req.body.newLast } } },
+        function (err) {
+          if (err) return res.status(400).json({ success: false, err: err });
+        },
+      );
+    }
+
+    return res
+      .status(200)
+      .json({ success: true, message: 'Name changed successfully!' });
+  },
+);
+app.get(
+  '/api/searchUserByEmail',
+  passport.authenticate('jwt', { session: false }),
+  // searches for a SINGLE USER
+  async function (req, res) {
+    if (!req.body.searchEmail) {
+      return res
+        .status(400)
+        .json({ success: false, err: 'Search query left empty' });
+    }
+    User.findOne({ email: req.body.searchEmail }, function (err, found) {
+      if (err) return res.status(400).json({ success: false, err: err });
+      if (!found) {
+        return res.status(200).json({
+          success: true,
+          message: 'No user with the searched email was found.',
+        });
+      }
+      return res.status(200).json({ success: true, found: found });
+    });
+  },
+);
+
 //get user id
 app.get(
   '/api/test/token',
