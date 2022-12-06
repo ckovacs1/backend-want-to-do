@@ -457,5 +457,5 @@ app.get(
   },
 );
 
-const port = 5000 || process.env.port;
+const port = 5000 || process.env.PORT;
 app.listen(port, () => console.log(`Server on port ${port}`));
