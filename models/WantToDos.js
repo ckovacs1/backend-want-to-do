@@ -9,7 +9,7 @@ const WantToDoSchema = new mongoose.Schema({
     title: {type: String, default: "Untitled Want-To-Do"},
     description: String, // assume it's not required 
     startDateTime: {type: Date, default: Date.now},
-    repetition: {type: Number, default: false}, // how many times repeat
+    repetition: {type: Number, default: false}, // how many times repeat, 0 is not repeat
     repeatType: {type: Number}, //daily = 1, weekly = 2, monthly = 3
     category: {type: String, required: true},
     complete: {type: Boolean, default: false}
