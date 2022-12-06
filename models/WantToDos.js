@@ -9,9 +9,8 @@ const WantToDoSchema = new mongoose.Schema({
     title: {type: String, default: "Untitled Want-To-Do"},
     description: String, // assume it's not required 
     startDateTime: {type: Date, default: Date.now},
-    endDateTime: {type: Date, default: Date.now}, // will making sure this date is later than startDate be handled before creating new doc? 
-    repetition: {type: Boolean, default: false}, // looks like repition value is a string
-    repeatOn: [String],
+    repetition: {type: Number, default: false}, // looks like repition value is a string
+    repeatType: {type: Number}, //daily = 1, weekly = 2, monthly = 3
     category: {type: String, required: true},
     complete: {type: Boolean, default: false}
 
