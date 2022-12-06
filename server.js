@@ -323,19 +323,19 @@ app.get(
       // to do
     }
 
-    User.findOne({ _id: req.params.id }, async function (err, found) {
+    User.findOne({ _id: req.params.id }, async function (err, otherUser) {
       if (err) return res.status(400).json({ success: false, error: err });
-      if (!found)
+      if (!otherUser)
         return res.status(400).json({ success: false, error: 'No user found' });
 
       const loggedIn = await User.findOne({ _id: req.user.id });
-      if (loggedIn.following.indexOf(found._id) === -1) {
+      if (loggedIn.following.indexOf(otherUser._id) === -1) {
         return res.status(200).json({
           success: true,
 
           data: {
             isFollowing: false,
-            other: found,
+            otherUser: otherUser,
           },
         }); // send less informatuion than if the user were following
       }
@@ -446,7 +446,6 @@ app.get(
   },
 );
 
-
 //get user id
 app.get(
   '/api/test/token',
@@ -458,5 +457,5 @@ app.get(
   },
 );
 
-const port = 5000;
-app.listen(5000, () => console.log('Server on port 5000'));
+const port = 5000 || process.env.port;
+app.listen(port, () => console.log(`Server on port ${port}`));
