@@ -7,6 +7,7 @@ const InvitedNotifSchema = new mongoose.Schema({
     date: { type: Date, default: Date.now() },
     invitedBy: { type: mongoose.Types.ObjectId, ref: 'User' },
   },
+  wantToDo: { type: mongoose.Types.ObjectId, ref: 'wantToDo' },
 });
 
 const InvitedNotifs = mongoose.model('InvitedNotif', InvitedNotifSchema);
