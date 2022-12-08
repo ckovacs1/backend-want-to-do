@@ -504,6 +504,28 @@ app.post(
   },
 );
 
+app.post(
+  '/api/setInviteNotifsAsRead/:id',
+  //use this authenticate middleware to get user id and info
+  passport.authenticate('jwt', { session: false }),
+  async function (req, res) {
+    if (!req.params.id) {
+      return res.status(400).json({ success: false, err: 'Invalid userID' });
+    }
+
+    InvitedNotifs.findByIdAndUpdate({ _id: req.params.id }),
+      { $set: { read: true } },
+      function (err, found) {
+        if (err) return res.status(400).json({ success: false, err: err });
+        if (!found)
+          return res
+            .status(400)
+            .json({ success: false, err: 'No notif found with ID' });
+      };
+    return res.status(200).json({ success: true });
+  },
+);
+
 app.get(
   '/api/test/token',
   //use this authenticate middleware to get user id and info
