@@ -12,6 +12,7 @@ const User = require('./models/User');
 
 const toDo = require('./models/WantToDos');
 const Notif = require('./models/FollowNotifications');
+const invitedNotif = require('./models/InvitedNotifications');
 
 app.use(cors());
 
@@ -36,6 +37,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 const db = require('./db');
+const InvitedNotifs = require('./models/InvitedNotifications');
 
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
@@ -433,20 +435,75 @@ app.get(
         .status(400)
         .json({ success: false, err: 'Search query left empty' });
     }
-    User.findOne({ email: req.body.searchEmail }, function (err, found) {
-      if (err) return res.status(400).json({ success: false, err: err });
-      if (!found) {
-        return res.status(200).json({
-          success: true,
-          message: 'No user with the searched email was found.',
-        });
-      }
-      return res.status(200).json({ success: true, found: found });
-    });
+    User.findOne(
+      { email: req.body.searchEmail },
+      { $push: { followers: loggedInUser } },
+      function (err, found) {
+        if (err) return res.status(400).json({ success: false, err: err });
+        if (!found) {
+          return res.status(200).json({
+            success: true,
+            message: 'No user with the searched email was found.',
+          });
+        }
+        return res.status(200).json({ success: true, found: found });
+      },
+    );
   },
 );
 
-//get user id
+// created by the logged in user who wants to invite a friend to WTD
+// other friend is :id
+app.post(
+  '/api/createNewInviteNotif/:id',
+  //use this authenticate middleware to get user id and info
+  passport.authenticate('jwt', { session: false }),
+  async function (req, res) {
+    if (!req.params.id) {
+      return res.status(400).json({ success: false, err: 'Invalid userID' });
+    }
+    // assumes users already follow one another
+
+    const user = await User.findOne({ _id: req.user.id });
+
+    if (!user) {
+      return res
+        .status(400)
+        .json({ success: false, err: 'Something went wrong!' });
+    }
+
+    const newNotif = new invitedNotif({
+      read: false,
+      title: 'You have been added to a WantToDo!',
+      description: {
+        date: Date.now(),
+        invitedBy: user,
+      },
+    });
+
+    newNotif.save(function (err) {
+      if (err) return res.status(400).json({ success: false, err: err });
+    });
+
+    User.findOneAndUpdate(
+      { _id: req.params.id },
+      { $push: { inviteNotifs: newNotif } },
+      function (err, found) {
+        if (err) return res.status(400).json({ success: false, err: err });
+        if (!found) {
+          return res
+            .status(400)
+            .json({ success: false, message: 'No user found' });
+        }
+      },
+    );
+
+    const user2 = await User.findOne({ _id: req.params.id });
+
+    return res.status(200).json({ success: true, user: user2 });
+  },
+);
+
 app.get(
   '/api/test/token',
   //use this authenticate middleware to get user id and info

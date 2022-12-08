@@ -28,6 +28,7 @@ const UserSchema = new Schema({
   following: [{ type: mongoose.Types.ObjectId, ref: 'User' }],
   followers: [{ type: mongoose.Types.ObjectId, ref: 'User' }],
   notifications: [{ type: mongoose.Types.ObjectId, ref: 'Notification' }],
+  inviteNotifs: [{ type: mongoose.Types.ObjectId, ref: 'InviteNotification' }],
   toDos: [{ type: mongoose.Schema.Types.ObjectId, ref: 'toDos' }],
 });
 
