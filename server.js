@@ -107,20 +107,46 @@ app.get('/api/viewUsers', async function (req, res) {
   }).catch(err => console.log(err));
 });
 
-app.get('/api/viewNotifs', async function (req, res) {
-  // ALL EXISTING NOTIFS - NOT JUST NOTIFS FOR LOGGED IN USER!
-  await Notif.find({}, (err, allNotifs) => {
-    if (err) {
-      return res.status(400).json({ success: false, error: err });
-    }
-    if (!allNotifs.length) {
-      return res
-        .status(404)
-        .json({ success: false, error: `Notification not found` });
-    }
-    return res.status(200).json({ success: true, data: allNotifs });
-  }).catch(err => console.log(err));
-});
+app.get(
+  '/api/viewNotifs',
+  passport.authenticate('jwt', { session: false }),
+  async function (req, res) {
+    await Notif.find({ _id: { $in: req.user.notifications } })
+      .exec((err, allNotifs) => {
+        if (err) {
+          return res.status(400).json({ success: false, error: err });
+        }
+        if (!allNotifs.length) {
+          return res
+            .status(404)
+            .json({ success: false, error: `Notification not found` });
+        }
+        return res.status(200).json({ success: true, data: allNotifs });
+      })
+      .catch(err => console.log(err));
+  },
+);
+
+app.get(
+  '/api/viewInviteNotifs',
+  passport.authenticate('jwt', { session: false }),
+  async function (req, res) {
+    await invitedNotif
+      .find({ _id: { $in: req.user.inviteNotifs } })
+      .exec((err, allNotifs) => {
+        if (err) {
+          return res.status(400).json({ success: false, error: err });
+        }
+        if (!allNotifs.length) {
+          return res
+            .status(404)
+            .json({ success: false, error: `Notification not found` });
+        }
+        return res.status(200).json({ success: true, data: allNotifs });
+      })
+      .catch(err => console.log(err));
+  },
+);
 
 app.post(
   '/api/newFollowerNotif/:id',
