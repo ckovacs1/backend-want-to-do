@@ -270,7 +270,7 @@ router.put(
           message: 'toDo not found!',
         });
       }
-      toDo.complete = true;
+      toDo.complete = !toDo.complete;
       toDo
         .save()
         .then(() => {
