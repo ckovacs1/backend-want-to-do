@@ -3,6 +3,7 @@ const express = require('express'),
   mongoose = require('mongoose'),
   toDos = require('../models/WantToDos');
 const passport = require('passport');
+const User = require('../models/User');
 require('../config/passport')(passport);
 
 const currentMonth = new Date().getMonth();
@@ -287,6 +288,24 @@ router.put(
           });
         });
     });
+  },
+);
+
+app.get(
+  '/deleteAllToDos',
+  //use this authenticate middleware to get user id and info
+  passport.authenticate('jwt', { session: false }),
+  async function (req, res) {
+    User.findByIdAndUpdate(
+      { _id: req.user.id },
+      { $set: { toDos: [] } },
+      function (err) {
+        if (err) return res.status(200).json({ success: false });
+      },
+    );
+    return res
+      .status(200)
+      .json({ success: true, message: 'Your WantToDos have been cleared.' });
   },
 );
 
