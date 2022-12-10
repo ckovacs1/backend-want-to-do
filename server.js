@@ -464,20 +464,16 @@ app.get(
         .status(400)
         .json({ success: false, err: 'Search query left empty' });
     }
-    User.findOne(
-      { email: req.body.searchEmail },
-      { $push: { followers: loggedInUser } },
-      function (err, found) {
-        if (err) return res.status(400).json({ success: false, err: err });
-        if (!found) {
-          return res.status(200).json({
-            success: true,
-            message: 'No user with the searched email was found.',
-          });
-        }
-        return res.status(200).json({ success: true, found: found });
-      },
-    );
+    User.findOne({ email: req.body.searchEmail }, function (err, found) {
+      if (err) return res.status(400).json({ success: false, err: err });
+      if (!found) {
+        return res.status(200).json({
+          success: true,
+          message: 'No user with the searched email was found.',
+        });
+      }
+      return res.status(200).json({ success: true, found: found });
+    });
   },
 );
 
