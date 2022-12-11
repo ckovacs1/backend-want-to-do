@@ -178,25 +178,6 @@ app.post(
   },
 );
 
-app.post('/api/setNotifAsRead/:id', async function (req, res) {
-  // find a notification by notification id
-  // assigns its value as read
-  if (!req.params.id) {
-    return res.status(400).json({ success: false, error: 'No id in param' });
-  }
-  const getNotif = Notif.findOneAndUpdate(
-    { _id: req.params.id },
-    { $set: { read: true } },
-  );
-
-  if (!getNotif) {
-    return res
-      .status(400)
-      .json({ success: false, error: 'Notif does not exist' });
-  }
-  return res.status(200).json({ success: true });
-});
-
 app.get(
   '/api/viewFollowers',
   passport.authenticate('jwt', { session: false }),
