@@ -229,6 +229,7 @@ router.delete(
       .findOneAndDelete(
         { user: req.user.id, _id: req.params.id },
         (err, toDo) => {
+          console.log(toDo);
           if (err) {
             return res.status(400).json({ success: false, error: err });
           }

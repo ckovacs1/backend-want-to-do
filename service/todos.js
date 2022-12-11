@@ -26,6 +26,7 @@ const getRepeatTodosByDayOffset = (todo, dayOffset) => {
     const repeatIdx = i - 1;
     if (repeatIdx >= 0) {
       copiedTodo.repeatIdx = repeatIdx;
+      copiedTodo.parentId = todo._id;
       copiedTodo.complete = copiedTodo.repeat[repeatIdx].complete;
     }
 
@@ -53,6 +54,7 @@ const getRepeatTodosByMonthOffset = (todo, monthOffset) => {
     const repeatIdx = i - 1;
     if (repeatIdx >= 0) {
       copiedTodo.repeatIdx = repeatIdx;
+      copiedTodo.parentId = todo._id;
       copiedTodo.complete = copiedTodo.repeat[repeatIdx].complete;
     }
 
