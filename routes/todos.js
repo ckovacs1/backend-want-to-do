@@ -70,6 +70,14 @@ router.post(
       });
     }
 
+    // Add repeat
+    req.body.repeat = [];
+    for (let i = 2; i <= req.body.repetition; i++) {
+      req.body.repeat.push({
+        repeatId: i - 1,
+      });
+    }
+
     // Save friend's todos
     const friendIds = req.body.inviteFriends;
 
