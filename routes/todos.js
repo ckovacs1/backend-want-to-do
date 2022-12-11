@@ -4,6 +4,7 @@ const express = require('express'),
   toDos = require('../models/WantToDos');
 const passport = require('passport');
 const User = require('../models/User');
+const { getTodosByRepetition } = require('../service/todos');
 require('../config/passport')(passport);
 
 const currentMonth = new Date().getMonth();
@@ -188,7 +189,6 @@ router.get(
       .find(
         {
           user: req.user.id,
-          startDateTime: { $gte: fromDateD, $lte: toDateD },
         },
         (err, alltoDos) => {
           if (err) {
@@ -199,7 +199,19 @@ router.get(
               .status(404)
               .json({ success: false, error: `toDo not found` });
           }
-          return res.status(200).json({ success: true, data: alltoDos });
+
+          // get all todos by repeat
+
+          allRepeattoDos = alltoDos.reduce(
+            (prev, todo) => prev.concat(getTodosByRepetition(todo)),
+            [],
+          );
+
+          // filter today and tomorrow todos
+          console.log(allRepeattoDos[0].startDateTime);
+          //allRepeattoDos.filter(todo => todo.startDateTime);
+
+          return res.status(200).json({ success: true, data: allRepeattoDos });
         },
       )
       .catch(err => console.log(err));
@@ -291,7 +303,7 @@ router.put(
   },
 );
 
-app.get(
+router.get(
   '/deleteAllToDos',
   //use this authenticate middleware to get user id and info
   passport.authenticate('jwt', { session: false }),
