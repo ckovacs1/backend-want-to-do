@@ -229,6 +229,7 @@ router.delete(
       .findOneAndDelete(
         { user: req.user.id, _id: req.params.id },
         (err, toDo) => {
+          console.log(toDo);
           if (err) {
             return res.status(400).json({ success: false, error: err });
           }
@@ -289,8 +290,8 @@ router.put(
         });
       }
 
-      if (repeatIdx) {
-        const repeat = todo.repeat[repeatIdx];
+      if (repeatIdx !== null) {
+        const repeat = toDo.repeat[repeatIdx];
         repeat.complete = !repeat.complete;
       } else {
         toDo.complete = !toDo.complete;
