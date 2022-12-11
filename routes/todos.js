@@ -291,7 +291,7 @@ router.put(
   },
 );
 
-app.get(
+router.get(
   '/deleteAllToDos',
   //use this authenticate middleware to get user id and info
   passport.authenticate('jwt', { session: false }),
