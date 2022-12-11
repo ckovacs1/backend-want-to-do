@@ -11,6 +11,7 @@ const WantToDoSchema = new mongoose.Schema({
   startDateTime: { type: Date, default: Date.now },
   repetition: { type: Number, default: false }, // how many times repeat, 0 is not repeat
   repeatType: { type: Number }, //daily = 1, weekly = 2, monthly = 3
+  repeatIdx: { type: Number, default: null },
   category: { type: String, required: true },
   complete: { type: Boolean, default: false },
   repeat: [

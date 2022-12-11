@@ -289,8 +289,8 @@ router.put(
         });
       }
 
-      if (repeatIdx) {
-        const repeat = todo.repeat[repeatIdx];
+      if (repeatIdx !== null) {
+        const repeat = toDo.repeat[repeatIdx];
         repeat.complete = !repeat.complete;
       } else {
         toDo.complete = !toDo.complete;
