@@ -14,6 +14,7 @@ const copyTodo = todo => {
   return clonedObj;
 };
 
+//offset for copied todos
 const getRepeatTodosByDayOffset = (todo, dayOffset) => {
   const repeatTodos = [];
   for (let i = 0; i < todo.repetition; i++) {
@@ -64,6 +65,7 @@ const getRepeatTodosByMonthOffset = (todo, monthOffset) => {
   return repeatTodos;
 };
 
+//offset for daily, weekly, and monthly
 const getTodosByRepetition = todo => {
   let repeatTodos = [];
 

@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 
+//notification for invited wanttodo from another user
 const InvitedNotifSchema = new mongoose.Schema({
   read: { type: Boolean, default: false },
   title: { type: String, default: 'You have been added to a WantToDo!' },

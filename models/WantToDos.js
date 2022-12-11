@@ -11,15 +11,15 @@ const WantToDoSchema = new mongoose.Schema({
   startDateTime: { type: Date, default: Date.now },
   repetition: { type: Number, default: false }, // how many times repeat, 0 is not repeat
   repeatType: { type: Number }, //daily = 1, weekly = 2, monthly = 3
-  repeatIdx: { type: Number, default: null },
-  parentId: { type: mongoose.Schema.Types.ObjectId, default: null },
+  repeatIdx: { type: Number, default: null }, //index for repeated wanttodo/copy
+  parentId: { type: mongoose.Schema.Types.ObjectId, default: null }, //original of the repeated todo
   category: { type: String, required: true },
   complete: { type: Boolean, default: false },
   repeat: [
     {
       complete: { type: Boolean, default: false },
     },
-  ],
+  ], //complete for copied todo if repeated
 });
 
 const toDos = mongoose.model('WantToDo', WantToDoSchema);
