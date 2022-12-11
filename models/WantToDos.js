@@ -13,6 +13,11 @@ const WantToDoSchema = new mongoose.Schema({
   repeatType: { type: Number }, //daily = 1, weekly = 2, monthly = 3
   category: { type: String, required: true },
   complete: { type: Boolean, default: false },
+  repeat: [
+    {
+      complete: { type: Boolean, default: false },
+    },
+  ],
 });
 
 const toDos = mongoose.model('WantToDo', WantToDoSchema);
