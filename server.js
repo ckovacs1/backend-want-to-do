@@ -58,23 +58,7 @@ app.use('/api/todos', toDos);
 
 app.get('/profile', (req, res) => {
   res.json({
-    profiles: [
-      {
-        name: 'Charles Leclerc',
-        email: 'cleclerc@gmail.com',
-        bio: 'Charles Perceval Leclerc is a Monégasque racing driver, currently racing in Formula One for Scuderia Ferrari. He won the GP3 Series championship in 2016 and the FIA Formula 2 Championship in 2017.',
-      },
-      {
-        name: 'Lewis Hamilton',
-        email: 'lhamilton@mercedes.com',
-        bio: 'In Formula One, Hamilton has won a joint-record seven World Drivers Championship titles, and holds the records for the most wins, pole positions, and podium finishes, among others',
-      },
-      {
-        name: 'Nicolas Latifi',
-        email: 'test',
-        bio: 'test',
-      },
-    ],
+    profiles: [],
   });
 });
 
@@ -378,41 +362,6 @@ app.get(
         },
       });
     });
-  },
-);
-
-app.post(
-  '/api/changePassword',
-  //use this authenticate middleware to get user id and info
-  passport.authenticate('jwt', { session: false }),
-  async function (req, res) {
-    const oldPw = req.user.password;
-    const entered = req.body.currPw;
-    const match = await bcrypt.compare(req.body.currPw, req.user.password);
-
-    if (match === true) {
-      bcrypt.genSalt(10, function (err, salt) {
-        bcrypt.hash(req.body.newPw, salt, async function (err, hash) {
-          if (err) return res.status(400).json({ success: false, error: err });
-          else {
-            let doc = await User.findOneAndUpdate(
-              { _id: req.user.id },
-              { $set: { password: hash } },
-              { multi: true },
-            );
-          }
-        });
-      });
-    } else {
-      return res.status(400).json({
-        success: false,
-        error: 'Wrong current password.',
-      });
-    }
-
-    return res
-      .status(200)
-      .json({ success: true, message: 'password successfully changed!' });
   },
 );
 
