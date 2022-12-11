@@ -39,17 +39,6 @@ const conditionM = { startDateTime: { $gte: fromDateM, $lte: toDateM } };
 const conditionW = { startDateTime: { $gte: fromDateW, $lte: toDateW } };
 const conditionD = { startDateTime: { $gte: fromDateD, $lte: toDateD } };
 
-/* const isAuthenticated = (req, res, next) => {
-  if(!req.user) {
-    res.redirect('/'); 
-    console.log('redirecting');
-  } else {
-    next();
-  }
-}
-
-router.use(isAuthenticated) */
-
 const transactionOptions = {
   readPreference: 'primary',
   readConcern: { level: 'local' },
@@ -333,22 +322,5 @@ router.get(
       .json({ success: true, message: 'Your WantToDos have been cleared.' });
   },
 );
-
-/*   router.get('/viewtoDoByUserId/:id', async function (req, res) {
-    await toDos
-      .find({ user: req.params.id }, (err, toDo) => {
-        if (err) {
-          return res.status(400).json({ success: false, error: err });
-        }
-  
-        if (!toDo) {
-          return res
-            .status(404)
-            .json({ success: false, error: `toDo not found` });
-        }
-        return res.status(200).json({ success: true, data: toDo });
-      })
-      .catch(err => console.log(err));
-  }); */
 
 module.exports = router;
