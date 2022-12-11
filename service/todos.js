@@ -21,12 +21,26 @@ const getRepeatTodosByDayOffset = (todo, dayOffset) => {
     copiedTodo.startDateTime.setDate(
       copiedTodo.startDateTime.getDate() + i * dayOffset,
     );
+
+    // overwrite copiedTodo repeat
+    const repeatIdx = i - 1;
+    if (repeatIdx >= 0) {
+      copiedTodo.repeatIdx = repeatIdx;
+      copiedTodo.complete = copiedTodo.repeat[repeatIdx].complete;
+    }
+
     repeatTodos.push(copiedTodo);
   }
 
   return repeatTodos;
 };
 
+/**
+ * Make array contains original and repeat todos
+ * @param {*} todo
+ * @param {*} monthOffset
+ * @returns
+ */
 const getRepeatTodosByMonthOffset = (todo, monthOffset) => {
   const repeatTodos = [];
   for (let i = 0; i < todo.repetition; i++) {
@@ -34,6 +48,14 @@ const getRepeatTodosByMonthOffset = (todo, monthOffset) => {
     copiedTodo.startDateTime.setMonth(
       copiedTodo.startDateTime.getMonth() + i * monthOffset,
     );
+
+    // overwrite copiedTodo repeat
+    const repeatIdx = i - 1;
+    if (repeatIdx >= 0) {
+      copiedTodo.repeatIdx = repeatIdx;
+      copiedTodo.complete = copiedTodo.repeat[repeatIdx].complete;
+    }
+
     repeatTodos.push(copiedTodo);
   }
 

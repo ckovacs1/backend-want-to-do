@@ -15,7 +15,6 @@ const WantToDoSchema = new mongoose.Schema({
   complete: { type: Boolean, default: false },
   repeat: [
     {
-      repeatId: { type: Number },
       complete: { type: Boolean, default: false },
     },
   ],

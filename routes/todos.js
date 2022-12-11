@@ -72,9 +72,9 @@ router.post(
 
     // Add repeat
     req.body.repeat = [];
-    for (let i = 2; i <= req.body.repetition; i++) {
+    for (let i = 0; i < req.body.repetition - 1; i++) {
       req.body.repeat.push({
-        repeatId: i - 1,
+        complete: false,
       });
     }
 
@@ -209,15 +209,10 @@ router.get(
           }
 
           // get all todos by repeat
-
           allRepeattoDos = alltoDos.reduce(
             (prev, todo) => prev.concat(getTodosByRepetition(todo)),
             [],
           );
-
-          // filter today and tomorrow todos
-          console.log(allRepeattoDos[0].startDateTime);
-          //allRepeattoDos.filter(todo => todo.startDateTime);
 
           return res.status(200).json({ success: true, data: allRepeattoDos });
         },
@@ -278,6 +273,8 @@ router.put(
   async function (req, res) {
     const body = req.body;
 
+    const repeatIdx = body.repeatIdx; // null or Number
+
     if (!body) {
       return res.status(400).json({
         success: false,
@@ -291,7 +288,14 @@ router.put(
           message: 'toDo not found!',
         });
       }
-      toDo.complete = !toDo.complete;
+
+      if (repeatIdx) {
+        const repeat = todo.repeat[repeatIdx];
+        repeat.complete = !repeat.complete;
+      } else {
+        toDo.complete = !toDo.complete;
+      }
+
       toDo
         .save()
         .then(() => {
