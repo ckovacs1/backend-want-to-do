@@ -407,6 +407,29 @@ app.get(
   },
 );
 
+app.get(
+  '/api/findUserByEmail/:email',
+  passport.authenticate('jwt', { session: false }),
+  // searches for a SINGLE USER
+  async function (req, res) {
+    if (!req.params.email) {
+      return res
+        .status(400)
+        .json({ success: false, err: 'Search query left empty' });
+    }
+
+    User.findOne({ email: req.params.email }, function (err, found) {
+      if (err) return res.status(400).json({ success: false, err: err });
+      if (!found) {
+        return res
+          .status(200)
+          .json({ success: false, message: 'No user found with this email.' });
+      }
+      return res.status(200).json({ success: false, user: found });
+    });
+  },
+);
+
 // created by the logged in user who wants to invite a friend to WTD
 // other friend is :id
 app.post(
