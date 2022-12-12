@@ -297,7 +297,7 @@ app.post(
     }
 
     const updateUser = await User.findOneAndUpdate(
-      { _id: req.user._id }, // return data here?
+      { _id: req.user.id }, // return data here?
       { $push: { following: toFollowUser } },
     );
 
