@@ -68,6 +68,7 @@ router.post('/login', (req, res) => {
               success: true,
               token: 'Bearer ' + token,
             });
+            //console.log(token);
           },
         );
       } else {

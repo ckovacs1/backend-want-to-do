@@ -279,43 +279,30 @@ app.post(
   '/api/follow/:id',
   passport.authenticate('jwt', { session: false }),
   async function (req, res) {
-    const involvedUsers = [];
     if (!req.params.id) {
       return res
         .status(400)
         .json({ success: false, error: 'No user id provided' });
     }
+    const toFollowID = req.params.id;
+    const loggedInUser = await User.findOne({ _id: req.user.id });
+    const toFollowUser = await User.findOneAndUpdate(
+      { _id: toFollowID },
+      { $push: { followers: loggedInUser } },
+    );
 
-    User.findOne({ _id: req.user.id }, function (err, found) {
-      if (err) {
-        return res.status(400).json({ success: false, error: err });
-      }
+    if (!toFollowUser) {
+      return res.status(400).json({ success: false, error: 'err' });
+    }
 
-      const isGoingToFollow = found.following.concat(req.params.id);
-      involvedUsers.push(found);
-      User.findOneAndUpdate(
-        { _id: req.user.id },
-        { $set: { following: isGoingToFollow } },
-      );
+    const updateUser = await User.findOneAndUpdate(
+      { _id: req.user.id }, // return data here?
+      { $push: { following: toFollowUser } },
+    );
+
+    return res.status(200).json({
+      success: true,
     });
-    User.findOne({ _id: req.params.id }, function (err, found) {
-      if (err) {
-        return res.status(400).json({ success: false, error: err });
-      }
-      const getsNewFollower = found.followers.concat(req.user.id);
-      involvedUsers.push(found);
-      User.findByIdAndUpdate(
-        { _id: req.params.id },
-        { $set: { followers: getsNewFollower } },
-      );
-    });
-    return res
-      .status(200)
-      .json({
-        success: true,
-        followedSomeone: involvedUsers[0],
-        gotNewFolloer: involvedUsers[1],
-      });
   },
 );
 
