@@ -236,6 +236,7 @@ app.post(
           .status(400)
           .json({ success: false, error: 'User not found' });
       }
+
       const removeFollowerIdx = found.followers.indexOf(req.user.id);
 
       if (removeFollowerIdx === -1) {
@@ -283,8 +284,21 @@ app.post(
         .status(400)
         .json({ success: false, error: 'No user id provided' });
     }
+
+    if (req.params.id === req.user.id) {
+      return res
+        .status(400)
+        .json({ success: true, message: 'You cannot follow yourself!' });
+    }
+
     const toFollowID = req.params.id;
     const loggedInUser = await User.findOne({ _id: req.user.id });
+    if (loggedInUser.following.indexOf(req.params.id) !== -1) {
+      return res
+        .status(400)
+        .json({ success: true, message: 'You already follow this user!' });
+    }
+
     const toFollowUser = await User.findOneAndUpdate(
       { _id: toFollowID },
       { $push: { followers: loggedInUser } },
@@ -301,6 +315,7 @@ app.post(
 
     return res.status(200).json({
       success: true,
+      message: 'Follow successful!',
     });
   },
 );
