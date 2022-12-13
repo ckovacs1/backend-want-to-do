@@ -138,6 +138,8 @@ app.post(
     // logged in user user is the one that folows
     // other user is the one that recieves the notif
     const getsNotif = await User.findOne({ _id: req.params.id });
+
+    console.log(getsNotif);
     const newFollower = await User.findOne({ _id: req.user.id });
 
     if (!getsNotif) {
@@ -146,6 +148,15 @@ app.post(
         .json({ success: false, error: "User id doesn't exist" });
     }
 
+    for (const notif of getsNotif.notifications) {
+      Notif.findOne({ _id: notif }, function (err, found) {
+        if (found.description.follower == req.user.id) {
+          return res
+            .status(400)
+            .json({ success: false, message: 'You follow this user!' });
+        }
+      });
+    }
     const newNotif = new Notif({
       read: false,
       title: 'You have a new follower',
