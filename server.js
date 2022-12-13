@@ -95,8 +95,8 @@ app.get(
   '/api/viewNotifs',
   passport.authenticate('jwt', { session: false }),
   async function (req, res) {
-    await Notif.find({ _id: { $in: req.user.notifications } })
-      .exec((err, allNotifs) => {
+    await Notif.find({ _id: { $in: req.user.notifications } }).exec(
+      (err, allNotifs) => {
         if (err) {
           return res.status(400).json({ success: false, error: err });
         }
@@ -106,8 +106,8 @@ app.get(
             .json({ success: false, error: `Notification not found` });
         }
         return res.status(200).json({ success: true, data: allNotifs });
-      })
-      .catch(err => console.log(err));
+      },
+    );
   },
 );
 
@@ -127,8 +127,7 @@ app.get(
             .json({ success: false, error: `Notification not found` });
         }
         return res.status(200).json({ success: true, data: allNotifs });
-      })
-      .catch(err => console.log(err));
+      });
   },
 );
 
